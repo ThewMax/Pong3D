@@ -13,4 +13,16 @@ public class Ball : MonoBehaviour {
     // Update is called once per frame
     void Update() {
     }
+
+    void OnCollisionEnter(Collision col) {
+        PlayerBorder p = col.gameObject.GetComponent<PlayerBorder>();
+        if (p == null) {
+            Vector3 vel = GetComponent<Rigidbody>().velocity;
+            float a = 1.1f;
+            vel.x *= a;
+            vel.y *= a;
+            vel.z *= a;
+            GetComponent<Rigidbody>().velocity = vel;
+        }
+    }
 }
