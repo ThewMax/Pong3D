@@ -2,52 +2,67 @@ Shader "Unlit/Tracer"
 {
     Properties
     {
+        _MainTex ("Texture", 2D) = "white" {}
         _Color ("Color", Color) = (1,1,1,1)
         _Reflex ("Reflection", Vector) = (0.25,0.5,0.25)
         _Gloss ("Gloss", float) = 1.0
     }
+
+    CGINCLUDE
+        #include "UnityCG.cginc"
+        #include "Lighting.cginc"
+        #include "AutoLight.cginc"
+
+        float4 _Color;
+        float4 _Reflex;
+        float _Gloss;
+        sampler2D _MainTex;
+        float4 _MainTex_ST;
+
+        struct appdata
+        {
+            float4 vertex : POSITION;
+            float2 uv : TEXCOORD0;
+            float3 normal : NORMAL;
+        };
+
+        struct Interpolator
+        {
+            float2 uv : TEXCOORD0;
+            float4 vertex : SV_POSITION;
+            float3 normal : TEXCOORD1;
+            float4 pos : TEXCOORD2;
+            float4 _ShadowCoord : TEXCOORD3;
+        };
+    ENDCG
+
     SubShader
     {
         Tags { "RenderType"="Opaque" }
-        LOD 100
 
         Pass
         {
             Tags {"LightMode" = "ForwardBase"}
+            LOD 100
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag
             #pragma multi_compile_fwdbase 
 
-            #include "UnityCG.cginc"
-            #include "Lighting.cginc"
-
-            struct appdata
+            float4 ComputeScreenPosit (float4 p)
             {
-                float4 vertex : POSITION;
-                float2 uv : TEXCOORD0;
-                float3 normal : NORMAL;
-            };
-
-            struct Interpolator
-            {
-                float2 uv : TEXCOORD0;
-                float4 vertex : SV_POSITION;
-                float3 normal : TEXCOORD1;
-                float4 pos : TEXCOORD2;
-            };
-
-            float4 _Color;
-            float4 _Reflex;
-            float _Gloss;
+                float4 o = p * 0.5;
+                return float4(float2(o.x, o.y*_ProjectionParams.x) + o.w, p.zw);
+            }
 
             Interpolator vert (appdata v)
             {
                 Interpolator o;
                 o.vertex = UnityObjectToClipPos(v.vertex);
-                //o.uv = TRANSFORM_TEX(v.uv, _MainTex);
+                o.uv = TRANSFORM_TEX(v.uv, _MainTex);
                 o.normal = UnityObjectToWorldNormal(v.normal);
                 o.pos = mul( unity_ObjectToWorld, v.vertex);
+                o._ShadowCoord = ComputeScreenPosit(o.vertex);
                 return o;
             }
 
@@ -71,7 +86,7 @@ Shader "Unlit/Tracer"
                 float3 specularLight = saturate(dot(V, R) * lightColor);
                 specularLight = pow( specularLight, _Gloss);
 
-                return float4(ambientLight + _Reflex.y * diffuseLight + _Reflex.z * specularLight, 1);
+                return lerp(float4(ambientLight, 1), float4(ambientLight + _Reflex.y * diffuseLight + _Reflex.z * specularLight, 1), step(0.5, SHADOW_ATTENUATION(i)));
             }
             ENDCG
         }
@@ -79,59 +94,21 @@ Shader "Unlit/Tracer"
         Pass
         {
             Tags {"LightMode" = "ShadowCaster"}
+            LOD 80
 
             CGPROGRAM
             #pragma vertex vertShadow
             #pragma fragment fragShadow
 
-            struct appdata
+            float4 vertShadow(appdata v) : SV_POSITION
             {
-                float4 vertex : POSITION;
-                float2 uv : TEXCOORD0;
-                float3 normal : NORMAL;
-            };
-
-            struct v2fShadow {
-                V2F_SHADOW_CASTER;
-                UNITY_VERTEX_OUTPUT_STEREO
-            };
-        
-            v2fShadow vertShadow( appdata v )
-            {
-                v2fShadow o;
-                UNITY_SETUP_INSTANCE_ID(v);
-                UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o);
-                TRANSFER_SHADOW_CASTER_NORMALOFFSET(o)
-                return o;
-            }
-        
-            float4 fragShadow( v2fShadow i ) : SV_Target
-            {
-                SHADOW_CASTER_FRAGMENT(i)
+                return UnityObjectToClipPos(v.vertex);
             }
 
-            // struct Interpolator
-            // {
-            //     float2 uv : TEXCOORD0;
-            //     float4 vertex : SV_POSITION;
-            //     float3 normal : TEXCOORD1;
-            //     float4 pos : TEXCOORD2;
-            // };
-
-            // Interpolator vertShadow(appdata v) : SV_POSITION
-            // {
-            //     Interpolator o;
-            //     o.vertex = UnityObjectToClipPos(v.vertex);
-            //     //o.uv = TRANSFORM_TEX(v.uv, _MainTex);
-            //     o.normal = UnityObjectToWorldNormal(v.normal);
-            //     o.pos = mul( unity_ObjectToWorld, v.vertex);
-            //     return o;
-            // }
-
-            // float4 fragShadow(Interpolator i): SV_Target
-            // {
-            //     return 0;
-            // }
+            float4 fragShadow(float4 i:SV_POSITION): SV_Target
+            {
+                return 0;
+            }
             ENDCG
         }
         
