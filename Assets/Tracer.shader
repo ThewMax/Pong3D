@@ -22,14 +22,14 @@ Shader "Unlit/Tracer"
         struct appdata
         {
             float4 vertex : POSITION;
-            float2 uv : TEXCOORD0;
             float3 normal : NORMAL;
+            float2 uv : TEXCOORD0;
         };
 
         struct Interpolator
         {
-            float2 uv : TEXCOORD0;
             float4 vertex : SV_POSITION;
+            float2 uv : TEXCOORD0;
             float3 normal : TEXCOORD1;
             float4 pos : TEXCOORD2;
             float4 _ShadowCoord : TEXCOORD3;
