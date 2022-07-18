@@ -6,6 +6,7 @@ public class ScoreUI : MonoBehaviour {
 	public int scorePlayerLeft = 0;
 	public int scorePlayerRight = 0;
 	public GUIStyle style;
+	public int timer;
 	
 	void OnGUI() {
 		float x = Screen.width / 2f;
@@ -15,5 +16,9 @@ public class ScoreUI : MonoBehaviour {
 		string text = scorePlayerLeft + " x " + scorePlayerRight;
 		
 		GUI.Label(new Rect(x - (width / 2), y, width, height), text, style);
+
+		if(timer != 0) {
+			GUI.Label(new Rect(x - (width / 2), y + 30f, width, height), timer.ToString(), style);
+		}
 	}
 }
