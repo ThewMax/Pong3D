@@ -9,6 +9,7 @@ public class PlayerBorder : MonoBehaviour {
 	public int timer;
 	public Ball ball;
 	public GameObject cylinder;
+	public Transform ballPivot;
 	
 	void OnCollisionEnter(Collision col) {
 		ball = col.gameObject.GetComponent<Ball>();
@@ -32,18 +33,32 @@ public class PlayerBorder : MonoBehaviour {
 	}
 
     IEnumerator Respawn() {
-		score.timer = timer;
+		ball.transform.SetParent(ballPivot);
+		ball.transform.localPosition = Vector3.zero;
+		if(!cylinder.GetComponent<Animation>().IsPlaying("Cylinder Animation")) {
+			cylinder.GetComponent<Animation>().Play();
+		}
+		score.timer = timer.ToString();
         if(timer > 0) {
+			score.GetComponent<Animation>().Play();
             timer--;
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(1f);
+			score.GetComponent<Animation>().Stop();
             StartCoroutine(Respawn());
         } else {
+			score.timer = "GO!!!";
+			score.timerSize = 200;
+            yield return new WaitForSeconds(1f);
+			score.timer = "";
 			cylinder.SetActive(false);
 			ResetBall();
 		}
     }
 
-	public void ResetBall() {		
+	public void ResetBall() {	
+		cylinder.GetComponent<Animation>().Stop();
+		ball.transform.SetParent(null);
+		ball.transform.position = new Vector3(0f, 1f, 0f);
 		ball.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.None;
 		ball.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezePositionY;
 		if (player == ePlayer.Left) {
