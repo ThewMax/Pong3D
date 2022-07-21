@@ -5,6 +5,7 @@ using UnityEngine;
 public class Ball : MonoBehaviour {
 	public Vector3 initialImpulse;
     public bool isPlaying = true;
+    public ParticleSystem imp;
 	
     // Start is called before the first frame update
     void Start() {
@@ -19,6 +20,8 @@ public class Ball : MonoBehaviour {
         if(isPlaying) {
             PlayerBorder p = col.gameObject.GetComponent<PlayerBorder>();
             if (p == null) {
+                imp.transform.position = transform.position;
+                imp.Play();
                 Vector3 vel = GetComponent<Rigidbody>().velocity;
                 float a = 1.1f;
                 vel.x *= a;
