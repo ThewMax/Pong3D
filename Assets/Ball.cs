@@ -16,6 +16,8 @@ public class Ball : MonoBehaviour {
     void Update() {
         Vector3 vel = GetComponent<Rigidbody>().velocity;
         vel *= -1;
+        float magni = vel.magnitude / 8;
+        Vector3 origvel = Vector3.Normalize(vel);
         float toSumDegr = 0;
         if (vel.x < 0 & vel.z < 0) {
             toSumDegr = 180;
@@ -30,10 +32,10 @@ public class Ball : MonoBehaviour {
             vel = new Vector3(vel.z,0f,-vel.x);
         }
         float cossi = vel.z / Mathf.Sqrt(Mathf.Pow(vel.x, 2f) + Mathf.Pow(vel.z, 2f));
-        // float formul = vel.x / Mathf.Abs(vel.x);
-        print(Mathf.Acos(cossi));
         float degr = toSumDegr + (Mathf.Rad2Deg * Mathf.Acos(cossi));
         Transform cone = transform.GetChild(0);
+        cone.localPosition = origvel * magni;
+        cone.localScale = new Vector3(cone.localScale.x, cone.localScale.y, magni * 100);
         cone.rotation = Quaternion.Euler(0f, degr, 0f);
     }
 
@@ -44,7 +46,7 @@ public class Ball : MonoBehaviour {
                 imp.transform.position = transform.position;
                 imp.Play();
                 Vector3 vel = GetComponent<Rigidbody>().velocity;
-                float a = 1f;
+                float a = 1.05f;
                 vel.x *= a;
                 vel.y *= a;
                 vel.z *= a;
