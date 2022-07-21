@@ -14,6 +14,27 @@ public class Ball : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
+        Vector3 vel = GetComponent<Rigidbody>().velocity;
+        vel *= -1;
+        float toSumDegr = 0;
+        if (vel.x < 0 & vel.z < 0) {
+            toSumDegr = 180;
+            vel.x *= -1;
+            vel.z *= -1;
+        }
+        else if (vel.z < 0){
+            toSumDegr = 90;
+            vel = new Vector3(-vel.z,0f,vel.x);
+        } else if (vel.x < 0) {
+            toSumDegr = 270;
+            vel = new Vector3(vel.z,0f,-vel.x);
+        }
+        float cossi = vel.z / Mathf.Sqrt(Mathf.Pow(vel.x, 2f) + Mathf.Pow(vel.z, 2f));
+        // float formul = vel.x / Mathf.Abs(vel.x);
+        print(Mathf.Acos(cossi));
+        float degr = toSumDegr + (Mathf.Rad2Deg * Mathf.Acos(cossi));
+        Transform cone = transform.GetChild(0);
+        cone.rotation = Quaternion.Euler(0f, degr, 0f);
     }
 
     void OnCollisionEnter(Collision col) {
@@ -23,7 +44,7 @@ public class Ball : MonoBehaviour {
                 imp.transform.position = transform.position;
                 imp.Play();
                 Vector3 vel = GetComponent<Rigidbody>().velocity;
-                float a = 1.1f;
+                float a = 1f;
                 vel.x *= a;
                 vel.y *= a;
                 vel.z *= a;
