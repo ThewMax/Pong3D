@@ -10,6 +10,7 @@ public class ScoreUI : MonoBehaviour {
 	public string timer;
 	public int timerSize;
 	
+	// Gera a interface do score
 	void OnGUI() {
 		float x = Screen.width / 2f;
 		float y = 30f;

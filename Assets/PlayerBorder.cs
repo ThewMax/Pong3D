@@ -11,27 +11,34 @@ public class PlayerBorder : MonoBehaviour {
 	public GameObject cylinder;
 	public Transform ballPivot;
 	
+	// Função que verifica colisão da bola com os gols
 	void OnCollisionEnter(Collision col) {
 		ball = col.gameObject.GetComponent<Ball>();
 		if (ball != null) {
+			// Move o sistema de particulas de comemoração do gol e dá play nele
 			ps.transform.position = ball.transform.position;
 			ps.Play();
+
+			// Dá restart na posição e velocidade da bolinha
 			ball.GetComponent<Rigidbody>().constraints = RigidbodyConstraints.FreezeAll;
 			ball.transform.position = new Vector3(0f, 1f, 0f);
 			ball.GetComponent<Rigidbody>().velocity = new Vector3(0f,0f,0f);	
 
+			// registra score do jogo
 			if (player == ePlayer.Left) {
 				score.scorePlayerRight++;
 			} else if (player == ePlayer.Right) {
 				score.scorePlayerLeft++;
 			}
 
+			// Cilindro de pausa entre os gols
 			cylinder.SetActive(true);
 			timer = 3;
 			StartCoroutine(Respawn());
 		}
 	}
 
+	// Rotina que faz o respawn da bolinha com a animação do cilindro
     IEnumerator Respawn() {
 		ball.transform.SetParent(ballPivot);
 		ball.transform.localPosition = Vector3.zero;
@@ -55,6 +62,7 @@ public class PlayerBorder : MonoBehaviour {
 		}
     }
 
+	// Reinicializa a bola e seus componentes
 	public void ResetBall() {	
 		cylinder.GetComponent<Animation>().Stop();
 		ball.transform.SetParent(null);

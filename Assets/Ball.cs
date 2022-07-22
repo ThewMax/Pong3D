@@ -8,11 +8,14 @@ public class Ball : MonoBehaviour {
     public ParticleSystem imp;
 	
     // Start is called before the first frame update
+    // Dá o impulso inicial da bolinha
     void Start() {
         GetComponent<Rigidbody>().AddForce(initialImpulse, ForceMode.Impulse);
     }
 
     // Update is called once per frame
+    // Estamos usando a função Update para calcular a direção, posição e escala 
+    // do cone do efeito de velocidade
     void Update() {
         Vector3 vel = GetComponent<Rigidbody>().velocity;
         vel *= -1;
@@ -39,6 +42,8 @@ public class Ball : MonoBehaviour {
         cone.rotation = Quaternion.Euler(0f, degr, 0f);
     }
 
+    // Faz a colisão da bolinha com os players e com a parede
+    // Acelera a bolinha pelo fator "a" e instancia o efeito de particula de impacto
     void OnCollisionEnter(Collision col) {
         if(isPlaying) {
             PlayerBorder p = col.gameObject.GetComponent<PlayerBorder>();

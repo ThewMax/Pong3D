@@ -55,7 +55,7 @@ Shader "Unlit/Tracer"
             #pragma multi_compile_fwdbase 
 
             // Essa função usa a posição atual do ponto para calcular se há uma sombra projetada aqui
-            // Funcionamento meio obscuro
+            // Funcionamento meio obscuro, encontrada em: https://forum.unity.com/threads/how-to-make-unlit-shader-that-casts-shadow.646246/
             float4 ComputeScreenPosit (float4 p)
             {
                 float4 o = p * 0.5;
@@ -108,7 +108,7 @@ Shader "Unlit/Tracer"
 
         // Segunda passagem de Cg, faz o Shadow Casting, é automática
         // Então os retornos das funç~eos são minimizados, pois devem existir
-        // Vertex e Pixel Shader para funcionar.
+        // Vertex e Pixel Shader para funcionar. Também descobrimos que precisavamos defini-la em: https://forum.unity.com/threads/how-to-make-unlit-shader-that-casts-shadow.646246/
         Pass
         {
             Tags {"LightMode" = "ShadowCaster"}
