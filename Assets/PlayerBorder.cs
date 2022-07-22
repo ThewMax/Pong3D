@@ -39,28 +39,28 @@ public class PlayerBorder : MonoBehaviour {
 	}
 
 	// Rotina que faz o respawn da bolinha com a animação do cilindro
-    IEnumerator Respawn() {
+	IEnumerator Respawn() {
 		ball.transform.SetParent(ballPivot);
 		ball.transform.localPosition = Vector3.zero;
 		if(!cylinder.GetComponent<Animation>().IsPlaying("Cylinder Animation")) {
 			cylinder.GetComponent<Animation>().Play();
 		}
 		score.timer = timer.ToString();
-        if(timer > 0) {
+        	if(timer > 0) {
 			score.GetComponent<Animation>().Play();
-            timer--;
-            yield return new WaitForSeconds(1f);
+            		timer--;
+            		yield return new WaitForSeconds(1f);
 			score.GetComponent<Animation>().Stop();
-            StartCoroutine(Respawn());
-        } else {
+            		StartCoroutine(Respawn());
+        	} else {
 			score.timer = "GO!!!";
 			score.timerSize = 200;
-            yield return new WaitForSeconds(1f);
+           		yield return new WaitForSeconds(1f);
 			score.timer = "";
 			cylinder.SetActive(false);
 			ResetBall();
 		}
-    }
+	}
 
 	// Reinicializa a bola e seus componentes
 	public void ResetBall() {	
